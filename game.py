@@ -19,14 +19,14 @@ with open("data.txt", "r") as fr:
     if m != 11 | n != 11:
         print "have error in input"
 
-letters = list("as0")
+letters = list("pianeee")
 
 amazing = len(filter(lambda x: x == "0", letters))
 letters = filter(lambda x: x != "0", letters)
 answer = []
 
 
-def transform(letter_list, int_amazing):
+def transform(letter_list, int_amazing, mode):
     if int_amazing <= 0:
         return letter_list
     else:
@@ -34,7 +34,7 @@ def transform(letter_list, int_amazing):
             letter_list_copy = letter_list[:]
             letter_list_copy.append(x)
             int_amazing_copy = int_amazing - 1
-            last_letter_list = transform(letter_list_copy, int_amazing_copy)
+            last_letter_list = transform(letter_list_copy, int_amazing_copy, mode)
             if last_letter_list != None:
                 last_letter_list.extend(list(re.sub(r'0', '', word)))
                 ind = 0
@@ -45,14 +45,18 @@ def transform(letter_list, int_amazing):
                     else:
                         break
                 if ind == len(ans_letters) - 1:
-                    print i + 1, j + 1, "row", ans.group(0)
-                    answer.append([i + 1, j + 1, "row", ans.group(0)])
+                    if mode == "row":
+                        print i + 1, j + 1, mode, ans.group(0)
+                        answer.append([i + 1, j + 1, mode, ans.group(0)])
+                    else:
+                        print j + 1, i + 1, mode, ans.group(0)
+                        answer.append([j + 1, i + 1, mode, ans.group(0)])
 
 
 # read line by row
 for i in range(m):
     for j in range(0, m-1):
-        for k in range(1, m+112):
+        for k in range(1, m+1):
             if j+k >= m:
                 break
             word = data[i, j:j+k+1]
@@ -71,12 +75,26 @@ for i in range(m):
                 if ans:
                     ans_letters = list(ans.group(0))
                     letters_copy = letters[:]
-                    transform(letters_copy, amazing)
+                    if amazing > 0:
+                        transform(letters_copy, amazing, "row")
+                    else:
+                        ind = 0
+                        letters_copy = letters[:]
+                        for index, ans_letter in enumerate(ans_letters):
+                            if ans_letter in letters_copy:
+                                del (letters_copy[letters_copy.index(ans_letter)])
+                                ind = index
+                            else:
+                                break
+                        if ind == len(ans_letters) - 1:
+                            print i + 1, j + 1, "row", ans.group(0)
+                            answer.append([i + 1, j + 1, "row", ans.group(0)])
+
 
 data = data.T
 for i in range(m):
     for j in range(0, m-1):
-        for k in range(1, m+112):
+        for k in range(1, m+1):
             if j+k >= m:
                 break
             word = data[i, j:j+k+1]
@@ -95,9 +113,22 @@ for i in range(m):
                 if ans:
                     ans_letters = list(ans.group(0))
                     letters_copy = letters[:]
-                    transform(letters_copy, amazing)
-
+                    if amazing > 0:
+                        transform(letters_copy, amazing, "column")
+                    else:
+                        ind = 0
+                        letters_copy = letters[:]
+                        for index, ans_letter in enumerate(ans_letters):
+                            if ans_letter in letters_copy:
+                                del (letters_copy[letters_copy.index(ans_letter)])
+                                ind = index
+                            else:
+                                break
+                        if ind == len(ans_letters) - 1:
+                            print j + 1, i + 1, "column", ans.group(0)
+                            answer.append([j + 1, i + 1, "column", ans.group(0)])
 data = data.T
+
 
 
 
